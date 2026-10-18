@@ -1,0 +1,89 @@
+My project is StudyBuddy, an Ed-Tech tutoring platform built as MCA Semester II Major Project at GLS University, Faculty of Computer Application and IT.
+Tech Stack: React.js (frontend) · Express.js (backend) · MySQL (database) · Socket.io (real-time group chat) · OpenAI API (AI chat) · YouTube Data API (video moderation) · Google Vision API (image/scene moderation)
+Three user roles: Student, Tutor, Admin
+
+HOW THE PLATFORM WORKS:
+A user registers as a student by default. To become a tutor they submit an application with verification documents (institute letter, certificates) and a mandatory trial video. Admin reviews and either approves (upgrading role to tutor) or rejects with a reason. Rejected applicants can reapply.
+Tutors create courses under IT categories (Web Dev, AI, Cybersecurity etc.) with difficulty levels, pricing, outcomes, and thumbnails. They upload resources (PDF, image, YouTube video only — PPT and audio are NOT supported) which go through a mandatory 6-step moderation pipeline before going live:
+
+Step 1 → File type check
+Step 2 → Text extraction (PDF only) via extraction → saved permanently
+Step 3 → OCR (Image only) → not saved
+Step 4 → Text moderation via OpenAI
+Step 5 → Image moderation via Google Vision SafeSearch
+Step 6 → Video moderation via YouTube API (metadata + random scene extraction + transcript)
+
+Pipeline result is either auto-approved, auto-rejected, or flagged for admin manual review.
+Resources can be standalone or attached to a course. They can be free or locked (paid). Tutors can also group resources AND courses together into bundles sold at a single manual price.
+Students can unlock content three ways:
+
+Buy the full course
+Buy a bundle
+Buy a single resource individually
+
+All purchases go through a central payments table. Admin can approve refund requests.
+Students can leave course reviews and tutor reviews (with star rating + comment). Tutors can reply. Admin can hide inappropriate reviews.
+The platform has an AI chatbot powered by OpenAI. It supports three modes — general, course-specific, resource-specific. There is a global daily message limit per user tracked in a separate table. History is stored and sent with every API call so the AI remembers context. Usage resets daily.
+Group chat is powered by Socket.io + MySQL. Any student can create a group with a fixed member limit. Groups have a free message quota shared across all members. When quota is hit, any member can pay to top up the shared pool. Groups are private but members can report specific messages — admin only reviews reported messages, not the full chat. Suspended/banned users are auto-removed from groups. If the last member is suspended the group is marked inactive but preserved.
+
+DATABASE: 28 TABLES across 11 groups:
+
+User Management → users, tutor_profiles, tutor_skills
+Tutor Verification → tutor_applications, tutor_application_documents
+Courses & Categories → categories, courses
+Resources & Moderation → resources, resource_categories, resource_moderation_logs, resource_extracted_content, resource_access_logs
+Video Moderation → video_metadata, video_moderation_scenes
+Enrollments → enrollments
+Bundles → bundles, bundle_items
+Payments & Refunds → payments, refunds
+Reviews → course_reviews, tutor_reviews
+AI Chat → ai_chat_logs, ai_chat_usage
+Group Chat → groups, group_members, group_messages, group_message_reports, group_payments
+
+Key schema decisions:
+
+users table has role ENUM (student/tutor/admin) and status ENUM (active/suspended/banned)
+bundle_items uses item_type ENUM (course/resource) with nullable course_id and resource_id
+payments has three nullable FKs — course_id, bundle_id, resource_id — only one filled per row
+resource_extracted_content stores PDF text permanently for re-moderation and category matching
+OCR text from images is NOT saved — only used during pipeline
+ai_chat_usage has unique constraint on (user_id, usage_date) — one row per user per day
+groups has messages_used and extra_quota columns for shared quota tracking
+group_payments links to main payments table to keep all financials unified
+resource_access_logs tracks free standalone resource access for review eligibility
+
+
+BACKEND: 16 classes (models) with methods:
+
+User → create, getById, getByEmail, getAll, updateProfile, verifyEmail, changePassword, suspend, ban, reactivate
+TutorApplication → submit, getById, getAll, getPending, approve, reject
+Category → create, getAll, getById
+Course → create, getById, getAll, getByTutor, getByCategory, updateDetails, updatePrice, publish, unpublish, delete
+Resource → upload, getById, getAll, getByCourse, getStandalone, approve, reject, flag, lock, unlock, updatePrice, delete, logAccess
+Enrollment → create, getById, getByStudent, getByCourse, isEnrolled, expire
+Bundle → create, getById, getByTutor, addItem, removeItem, publish, unpublish, delete
+Payment → create, getById, getByStudent, hasPaidFor, markRefunded
+Refund → request, getById, getPending, approve, reject
+CourseReview → submit, getById, getByCourse, reply, hide
+TutorReview → submit, getById, getByTutor, reply, hide
+AIChat → send, getHistory, getByContext
+AIChatUsage → getToday, checkLimit, increment, reset
+Group → create, getById, addMember, removeMember, transferAdmin, deactivate, checkQuota, incrementMessages, topUpQuota
+GroupMessage → send, getByGroup, hide, moderateFile
+GroupMessageReport → report, getPending, review, dismiss
+
+Folder structure:
+models/      → 16 class files
+services/    → cross-class logic (enrollmentService, paymentService, moderationService, aiService, groupService)
+controllers/ → HTTP request handlers
+routes/      → URL definitions
+config/      → DB connection, env variables
+
+DOCUMENTS COMPLETED:
+
+MP01 → Project planning, resource filter pipeline, feature design
+MP02 → Full data dictionary (28 tables, all fields with data types, constraints, descriptions)
+Class diagram → PlantUML code ready for draw.io (16 classes, black and white)
+
+Project title: StudyBuddy: An Integrated Web-Based Ed-Tech Platform for Smart Learning and Collaboration
+Team project · MCA Semester II · GLS University

@@ -1,0 +1,48 @@
+{
+  "type": "object",
+  "properties": {
+    "educational": {
+      "type": "boolean"
+    },
+    "harmful": {
+      "type": "boolean"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "none",
+        "sexual",
+        "hate",
+        "extremism",
+        "political_propaganda",
+        "violence",
+        "self_harm",
+        "drugs",
+        "fraud",
+        "harassment",
+        "dangerous_activity",
+        "non_educational",
+        "other"
+      ]
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "APPROVE",
+        "FLAG",
+        "REJECT"
+      ]
+    },
+    "reason": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "educational",
+    "harmful",
+    "category",
+    "decision",
+    "reason"
+  ],
+  "additionalProperties": false
+}

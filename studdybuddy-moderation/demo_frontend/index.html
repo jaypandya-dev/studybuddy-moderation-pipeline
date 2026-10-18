@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyBuddy Moderation Demo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>StudyBuddy Moderation</h1>
+        <p>AI-powered educational content moderation</p>
+    </header>
+
+    <section class="card">
+
+        <div class="field">
+            <label for="resourceType">Resource Type</label>
+
+            <select id="resourceType">
+                <option value="pdf">PDF</option>
+                <option value="image">Image</option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="fileInput">Select Resource</label>
+            <input
+                id="fileInput"
+                type="file"
+                accept=".pdf,image/png,image/jpeg,image/webp"
+            >
+        </div>
+
+        <button id="moderateButton">
+            Moderate Resource
+        </button>
+
+        <div id="errorMessage" class="error hidden"></div>
+
+    </section>
+
+    <section id="progressCard" class="card hidden">
+
+        <h2>Moderation Progress</h2>
+
+        <div class="progress-container">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
+
+        <div class="progress-info">
+            <span id="progressPercent">0%</span>
+            <span id="progressStatus">Starting...</span>
+        </div>
+
+        <div id="progressDetails" class="details"></div>
+
+    </section>
+
+    <section id="resultCard" class="card hidden">
+
+        <h2>Moderation Result</h2>
+
+        <div id="decision" class="decision"></div>
+
+        <div class="result-grid">
+            <div>
+                <span>Educational</span>
+                <strong id="educationalValue">-</strong>
+            </div>
+
+            <div>
+                <span>Harmful</span>
+                <strong id="harmfulValue">-</strong>
+            </div>
+
+            <div>
+                <span>Category</span>
+                <strong id="categoryValue">-</strong>
+            </div>
+        </div>
+
+        <div class="result-section">
+            <h3>Reason</h3>
+            <p id="reasonValue">-</p>
+        </div>
+
+        <div class="result-section">
+            <h3>AI Description</h3>
+            <p id="descriptionValue">-</p>
+        </div>
+
+        <div id="ocrSection" class="result-section hidden">
+            <h3>OCR Text</h3>
+            <pre id="ocrValue"></pre>
+        </div>
+
+    </section>
+
+    <section class="card status-card">
+
+        <h2>System Status</h2>
+
+        <div class="status-row">
+            <span>FastAPI</span>
+            <span id="apiStatus" class="status offline">
+                Checking...
+            </span>
+        </div>
+
+        <div class="status-row">
+            <span>Qwen3</span>
+            <span id="qwenStatus" class="status offline">
+                Checking...
+            </span>
+        </div>
+
+        <div class="status-row">
+            <span>SmolVLM2</span>
+            <span id="vlmStatus" class="status offline">
+                Checking...
+            </span>
+        </div>
+
+    </section>
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
